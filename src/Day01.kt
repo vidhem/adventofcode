@@ -25,15 +25,15 @@ fun main() {
 
         var sum = window.reduce { acc, i -> acc + i }
         var increases = 0
-        for (i in 3 until depths.size) {
-            val newSum = sum - window.peek() + depths[i]
+        for (depth in depths.drop(3)) {
+            val newSum = sum - window.peek() + depth
             if (newSum > sum) {
                 increases++
             }
 
             sum = newSum
             window.remove()
-            window.add(depths[i])
+            window.add(depth)
         }
 
         return increases
