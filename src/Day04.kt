@@ -1,8 +1,7 @@
 fun main() {
-    fun part1(input: List<String>): Int {
-        val order = input[0].split(',').map { it.toInt() }
+    fun readBoards(input: List<String>): List<List<MutableSet<Int>>> {
         val numBoards: Int = (input.size - 1) / 6
-        val boards: ArrayList<ArrayList<HashSet<Int>>> = ArrayList()
+        val boards = ArrayList<List<MutableSet<Int>>>()
 
         repeat(numBoards) { board ->
             val lines: ArrayList<List<Int>> = ArrayList()
@@ -25,6 +24,13 @@ fun main() {
             boards.add(wins)
         }
 
+        return boards
+    }
+
+    fun part1(input: List<String>): Int {
+        val order = input[0].split(',').map { it.toInt() }
+        val boards = readBoards(input)
+
         for (number in order) {
             for (board in boards) {
                 var won = false
@@ -44,12 +50,39 @@ fun main() {
     }
 
     fun part2(input: List<String>): Int {
+        val order = input[0].split(',').map { it.toInt() }
+        var boards = readBoards(input)
+
+        for (number in order) {
+            val newBoards = ArrayList(boards)
+            val indexesToRemove = ArrayList<Int>()
+
+            boards.forEachIndexed { index, board ->
+                for (combination in board) {
+                    combination.remove(number)
+                    if (combination.isEmpty()) {
+                        indexesToRemove.add(index)
+                        if (newBoards.size == 1) {
+                            val remainingNumbers = newBoards[0].flatten().toMutableSet()
+                            remainingNumbers.remove(number)
+
+                            return number * remainingNumbers.sum()
+                        }
+                        break
+                    }
+                }
+            }
+
+            indexesToRemove.reversed().forEach { newBoards.removeAt(it) }
+            boards = newBoards
+        }
+
         return input.size
     }
 
     // test if implementation meets criteria from the description, like:
     val testInput = readInput("Day04_test")
-    check(part1(testInput) == 4512)
+    check(part2(testInput) == 1924)
 
     val input = readInput("Day04")
     println(part1(input))
