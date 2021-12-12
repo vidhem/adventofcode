@@ -1,3 +1,4 @@
+package aoc2021
 
 import kotlin.math.abs
 import kotlin.math.max

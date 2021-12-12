@@ -1,3 +1,5 @@
+package aoc2021
+
 fun main() {
     fun part1(input: List<String>): Int {
         val bitCounts: ArrayList<HashMap<String, Int>> = ArrayList()

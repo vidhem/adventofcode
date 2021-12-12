@@ -1,3 +1,5 @@
+package aoc2021
+
 fun main() {
     fun part1(input: List<String>): Int {
         var timers = input[0].split(",")

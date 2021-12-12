@@ -1,3 +1,5 @@
+package aoc2021
+
 fun main() {
     fun readBoards(input: List<String>): List<List<MutableSet<Int>>> {
         val numBoards: Int = (input.size - 1) / 6
