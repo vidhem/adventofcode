@@ -2,17 +2,9 @@ package aoc2021
 
 import java.util.*
 
-class Node(val value: String) {
-    val edges: MutableSet<Node> = HashSet()
-
-    override fun toString(): String {
-        return value
-    }
-}
-
 fun main() {
 
-    fun part1(input: List<String>): Int {
+    fun part2(input: List<String>): Int {
         val nodes: MutableMap<String, Node> = HashMap()
         input.forEach {
             val (v1, v2) = it.split("-")
@@ -34,12 +26,21 @@ fun main() {
                 continue
             }
 
-            val visited = front.toSet()
+            val visited = front.toList().fold(HashMap<Node, Int>()) { acc, node ->
+                acc[node] = acc.getOrDefault(node, 0) + 1
+                acc
+            }
 
             front.last().edges.forEach {
-                if ((it.value.all { c -> c.isLowerCase() } && !visited.contains(it))
-                    || it.value.all { c -> c.isUpperCase() }) {
+                val isLowerCase = it.value.all { c -> c.isLowerCase() }
+                val isUpperCase = !isLowerCase
 
+                val hasLowercaseRepeated = visited.filter { entry -> entry.key.value.all { v -> v.isLowerCase() } }
+                    .any { entry -> entry.value > 1 }
+
+                val isStart = it.value == "start"
+
+                if ((isLowerCase && !visited.contains(it)) || (!isStart && isLowerCase && !hasLowercaseRepeated) || isUpperCase) {
                     val newPath = ArrayList(front)
                     newPath.add(it)
                     queue.add(newPath)
@@ -51,8 +52,8 @@ fun main() {
     }
 
     val testInput = readInput("Day12_test")
-    check(part1(testInput) == 226)
+    check(part2(testInput) == 3509)
 
     val input = readInput("Day12")
-    println(part1(input))
+    println(part2(input))
 }
