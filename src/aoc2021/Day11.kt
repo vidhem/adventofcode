@@ -13,23 +13,67 @@ inline fun <T> MutableList<T>.mapInPlace(mutator: (T)->T) {
 
 fun main() {
 
+    fun flashGrid(x: Int, y: Int, newGrid: MutableList<MutableList<Int>>) {
+        if (x > 0) {
+            newGrid[y][x-1] += 1
+            if (y < newGrid.size - 1) {
+                newGrid[y+1][x-1] += 1
+            }
+            if (y > 0) {
+                newGrid[y-1][x-1] += 1
+            }
+        }
+        if (y > 0) {
+            newGrid[y-1][x] += 1
+        }
+        if (x < newGrid[0].size - 1) {
+            newGrid[y][x+1] += 1
+            if (y > 0) {
+                newGrid[y-1][x+1] += 1
+            }
+            if (y < newGrid.size - 1) {
+                newGrid[y+1][x+1] += 1
+            }
+        }
+        if (y < newGrid.size - 1) {
+            newGrid[y+1][x] += 1
+        }
+    }
+
     fun part1(input: List<String>): Int {
-        val grid = input.map {
+        var grid = input.map {
             it.toCharArray().map { c -> c.digitToInt() }.toMutableList()
         }.toMutableList()
 
-        repeat(1) {
+        var totalFlashes = 0
+        repeat(100) {
             grid.forEach { row -> row.mapInPlace { it + 1 } }
+            val flashed = HashSet<Pair<Int, Int>>()
 
-            grid.forEachIndexed { xindex, row ->
-                row.forEachIndexed { yindex, energy ->
+            while (grid.flatten().any { it >= 10 }) {
+                val newGrid = ArrayList(grid)
+
+                grid.forEachIndexed { y, row ->
+                    row.forEachIndexed { x, energy ->
+                        if (energy >= 10 && !flashed.contains(Pair(x,y))) {
+                            totalFlashes += 1
+                            newGrid[y][x] = 0
+                            flashGrid(x, y, newGrid)
+                            flashed.add(Pair(x,y))
+                        }
+                    }
                 }
+
+                flashed.forEach { newGrid[it.second][it.first] = 0 }
+                grid = newGrid
             }
         }
 
-        return 0
+        return totalFlashes
     }
 
     val testInput = readInput("Day11_test")
     check(part1(testInput) == 1656)
+
+    println(part1(readInput("Day11")))
 }
