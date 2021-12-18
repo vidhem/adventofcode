@@ -72,8 +72,46 @@ fun main() {
         return totalFlashes
     }
 
-    val testInput = readInput("Day11_test")
-    check(part1(testInput) == 1656)
+    fun part2(input: List<String>): Int {
+        var grid = input.map {
+            it.toCharArray().map { c -> c.digitToInt() }.toMutableList()
+        }.toMutableList()
 
-    println(part1(readInput("Day11")))
+        var totalFlashes = 0
+        repeat(1000) {
+            grid.forEach { row -> row.mapInPlace { it + 1 } }
+            val flashed = HashSet<Pair<Int, Int>>()
+
+            while (grid.flatten().any { it >= 10 }) {
+                val newGrid = ArrayList(grid)
+
+                grid.forEachIndexed { y, row ->
+                    row.forEachIndexed { x, energy ->
+                        if (energy >= 10 && !flashed.contains(Pair(x,y))) {
+                            totalFlashes += 1
+                            newGrid[y][x] = 0
+                            flashGrid(x, y, newGrid)
+                            flashed.add(Pair(x,y))
+                        }
+                    }
+                }
+
+                flashed.forEach { newGrid[it.second][it.first] = 0 }
+                grid = newGrid
+            }
+
+            if (grid.flatten().all { el -> el == 0 }) {
+                return it + 1
+            }
+        }
+
+        return -1
+    }
+
+    val testInput = readInput("Day11_test")
+    check(part2(testInput) == 195)
+
+    val input = readInput("Day11")
+    println(part1(input))
+    println(part2(input))
 }
