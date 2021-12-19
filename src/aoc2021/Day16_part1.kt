@@ -6,63 +6,61 @@ fun main() {
         var versionSum = 0
         var pointer = 0
 
-        while (true) {
-            val remainingPacket = binary.substring(pointer)
-            if (remainingPacket.isEmpty() || remainingPacket.all { it == '0' }) {
-                break
-            }
+        val remainingPacket = binary.substring(pointer)
+        if (remainingPacket.isEmpty() || remainingPacket.all { it == '0' }) {
+            return Pair(versionSum, pointer)
+        }
 
-            versionSum += binary.substring(pointer, pointer + 3).toInt(2)
-            pointer += 3
-            val typeId = binary.substring(pointer, pointer + 3).toInt(2)
-            pointer += 3
+        versionSum += binary.substring(pointer, pointer + 3).toInt(2)
+        pointer += 3
+        val typeId = binary.substring(pointer, pointer + 3).toInt(2)
+        pointer += 3
 
-            if (typeId == 4) {
-                run {
-                    remainingPacket.substring(6)
-                        .chunked(5)
-                        .forEach {
-                            pointer += 5
-                            if (it[0] == '0') {
-                                return@run
-                            }
+        if (typeId == 4) {
+            run {
+                remainingPacket.substring(6)
+                    .chunked(5)
+                    .forEach {
+                        pointer += 5
+                        if (it[0] == '0') {
+                            return@run
                         }
-                }
-
-                break
+                    }
             }
 
-            val operatorType = binary[pointer]
-            pointer += 1
+            return Pair(versionSum, pointer)
+        }
 
-            if (operatorType == '0') {
-                val subPacketLength = binary.substring(pointer, pointer + 15).toInt(2)
-                pointer += 15
+        val operatorType = binary[pointer]
+        pointer += 1
 
-                var totalLength = 0
-                while (totalLength < subPacketLength) {
-                    val versionSumAndPosition = getVersionSum(binary.substring(pointer))
-                    versionSum += versionSumAndPosition.first
+        if (operatorType == '0') {
+            val subPacketLength = binary.substring(pointer, pointer + 15).toInt(2)
+            pointer += 15
 
-                    totalLength += versionSumAndPosition.second
-                    pointer += versionSumAndPosition.second
-                }
+            var totalLength = 0
+            while (totalLength < subPacketLength) {
+                val versionSumAndPosition = getVersionSum(binary.substring(pointer))
+                versionSum += versionSumAndPosition.first
 
-                break
+                totalLength += versionSumAndPosition.second
+                pointer += versionSumAndPosition.second
             }
 
-            if (operatorType == '1') {
-                val numPackets = binary.substring(pointer, pointer + 11).toInt(2)
-                pointer += 11
+            return Pair(versionSum, pointer)
+        }
 
-                repeat(numPackets) {
-                    val versionSumAndPosition = getVersionSum(binary.substring(pointer))
-                    versionSum += versionSumAndPosition.first
-                    pointer += versionSumAndPosition.second
-                }
+        if (operatorType == '1') {
+            val numPackets = binary.substring(pointer, pointer + 11).toInt(2)
+            pointer += 11
 
-                break
+            repeat(numPackets) {
+                val versionSumAndPosition = getVersionSum(binary.substring(pointer))
+                versionSum += versionSumAndPosition.first
+                pointer += versionSumAndPosition.second
             }
+
+            return Pair(versionSum, pointer)
         }
 
         return Pair(versionSum, pointer)
