@@ -137,9 +137,6 @@ fun main() {
     }
 
     fun part2(input: List<String>): Int {
-        val numbers = input.map { JsonParser.parseString(it).asJsonArray }
-            .map { SnailfishNumber.from(it) }
-
         var maxAddMagnitude = Int.MIN_VALUE
         for (i in input.indices) {
             for (j in input.indices) {
@@ -149,7 +146,7 @@ fun main() {
                 val b = SnailfishNumber.from(JsonParser.parseString(input[j]).asJsonArray)
                 val d = SnailfishNumber.from(JsonParser.parseString(input[j]).asJsonArray)
 
-                maxAddMagnitude = maxOf(maxAddMagnitude, magnitude(add(a,b)), magnitude(add(c,d)))
+                maxAddMagnitude = maxOf(maxAddMagnitude, magnitude(add(a,b)), magnitude(add(d,c)))
             }
         }
 
